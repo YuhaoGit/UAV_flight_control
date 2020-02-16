@@ -24,12 +24,12 @@ from numpy.linalg import inv
 def restPovec(id):
    if id == 1:
        mkpos = [0.3048,1.2509,0,1]
-   #elif id == 3:
-       #mkpos = [0.4255,1.2509,0,1]
-   #elif id == 5:
-       #mkpos = [0.3048,1.0541,0,1]
-   #elif id == 7:
-       #mkpos = [0.4255,1.0541,0,1]
+   elif id == 3:
+       mkpos = [0.4255,1.2509,0,1]
+   elif id == 5:
+       mkpos = [0.3048,1.0541,0,1]
+   elif id == 7:
+       mkpos = [0.4255,1.0541,0,1]
    elif id == 9:
        mkpos = [0.8303,1.2287,0,1]
    elif id == 11:
@@ -50,11 +50,11 @@ def restPovec(id):
        mkpos = [0,0,0,0]
    return mkpos
 
-if not os.path.exists('./calibration4.pckl'):
+if not os.path.exists('./calibration.pckl'):
     print("You need to calibrate the camera you'll be using. See calibration project directory for details.")
     exit()
 else:
-    f = open('calibration4.pckl', 'rb')
+    f = open('calibration.pckl', 'rb')
     (cameraMatrix, distCoeffs, _, _) = pickle.load(f)
     f.close()
     if cameraMatrix is None or distCoeffs is None:
@@ -95,8 +95,7 @@ def pose_estimation(msg):
 
                 # Initialize the camera coordinate
                 camcord=np.zeros((3,6))
-                
-                # Require 8 markers in a photo   i=i+1
+               
                 if ids is not None and len(ids) > 0:
                     num = num+1
                     
@@ -128,7 +127,7 @@ def pose_estimation(msg):
                         camy=np.append(camy,cameracord[0])
                         camz=np.append(camz,cameracord[1])
                     # Write the photo     
-                    cv2.imwrite(str(num)+".png",QueryImg)     ## should check every time to avoid overwrite  
+                    cv2.imwrite(str(num)+".png",QueryImg)     
                 else:
                     print("no image detected")
                     aland = 1
@@ -203,7 +202,7 @@ def main():
     error_est_z = 0*100
     error_est_vz = 0*100
 
-    # Observation Errors (To avoid S being singular matrix, cannot use the same multiply)
+    # Observation Errors 
     error_obs_x = 5 *100 # Uncertainty in the measurement
     error_obs_vx = 10 *100
     error_obs_y = 0.1 *100
@@ -260,7 +259,7 @@ def main():
 
     # initial kalman filter state (x,y,z,vx,vy,vz)
     X = np.array([[pos_x],
-                  [-3]])        # !!!The direction of speed in kalman filter is the reverse of the drone's speed
+                  [-3]])        # The direction of speed in kalman filter is the reverse of the drone's speed!!!
     Y = np.array([[pos_y],
                   [0]])
     Z = np.array([[pos_z],
@@ -278,12 +277,12 @@ def main():
     if(isMove):
       
       # Move on x direction (towards the marker)
-      while  (current_x < target_x-20 or current_x > target_x-6):                                     ####
+      while  (current_x < target_x-20 or current_x > target_x-6):                                  
          
          # within a safe x range (just pose estimation result, in case kalman filter not good)
          if (pos_x > target_x - 75  and pos_x < target_x + 95 and aland == 0):
            # within a safe y range
-           if (pos_y > target_y - 35  and pos_y < target_y + 100 and aland == 0):              ####
+           if (pos_y > target_y - 35  and pos_y < target_y + 100 and aland == 0):              
                
                prepose_x = pos_x
                prepose_y = pos_y               
@@ -291,10 +290,10 @@ def main():
 
                # set speed
                if (current_x < target_x-20):
-                   speedx = -0.01                      #!!!!Notice that the coordinate of world and drone are reversed
+                   speedx = -0.01                      #!!!Notice that the coordinate of world and drone are reversed
                    distance = target_x-20-current_x
                if (current_x > target_x-6):
-                   speedx = 0.03                       #!!!!Notice that the coordinate of world and drone are reversed
+                   speedx = 0.03                       #!!!Notice that the coordinate of world and drone are reversed
                    distance = current_x-target_x              
  
                # Prediction in Kalman filter
@@ -306,7 +305,7 @@ def main():
                Pz = A.dot(Pz).dot(A.T)
                
                # Calculate the Kalman gain
-               Sx = H.dot(Px).dot(H.T) + Rx +0.0001*H     # H represents the random error
+               Sx = H.dot(Px).dot(H.T) + Rx +0.0001*H     # 0.0001*H represents the random error
                Sy = H.dot(Py).dot(H.T) + Ry +0.0001*H
                Sz = H.dot(Pz).dot(H.T) + Rz +0.0001*H                      
                Kx = Px.dot(H.T).dot(inv(Sx))
@@ -434,10 +433,10 @@ def main():
 
                # set speed
                if (current_y < target_y-8):
-                   speedy = -0.01                      #!!!!Notice that the coordinate of world and drone are reversed
+                   speedy = -0.01                      #!!!Notice that the coordinate of world and drone are reversed
                    distance = target_y-8-current_y
                if (current_y > target_y+10):
-                   speedy = 0.02                       #!!!!Notice that the coordinate of world and drone are reversed
+                   speedy = 0.02                       #!!!Notice that the coordinate of world and drone are reversed
                    distance = current_y-target_y-10              
  
                # Prediction in Kalman filter
