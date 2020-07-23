@@ -163,7 +163,7 @@ def prediction2d(x,vx):
 def covariance2d(sigma_x, sigma_vx):
     sigma = np.array([[sigma_x, sigma_vx]])
     cov_matrix = (sigma.T).dot(sigma)
-    return cov_matrix              # let covariance = 0
+    return cov_matrix              
 
 
 def main():
@@ -277,7 +277,7 @@ def main():
     if(isMove):
       
       # Move on x direction (towards the marker)
-      while  (current_x < target_x-20 or current_x > target_x-6):                                  
+      while  (current_x < target_x-20 or current_x > target_x-20):                                  
          
          # within a safe x range (just pose estimation result, in case kalman filter not good)
          if (pos_x > target_x - 75  and pos_x < target_x + 95 and aland == 0):
@@ -292,9 +292,9 @@ def main():
                if (current_x < target_x-20):
                    speedx = -0.01                      #!!!Notice that the coordinate of world and drone are reversed
                    distance = target_x-20-current_x
-               if (current_x > target_x-6):
+               if (current_x > target_x-20):
                    speedx = 0.03                       #!!!Notice that the coordinate of world and drone are reversed
-                   distance = current_x-target_x              
+                   distance = current_x-target_x-20              
  
                # Prediction in Kalman filter
                X = prediction2d(X[0][0], X[1][0])
@@ -420,7 +420,7 @@ def main():
       current_y = Y[0,0]
       
       # Move on y direction    
-      while(current_y < target_y-8 or current_y > target_y+10):
+      while(current_y < target_y-20 or current_y > target_y+20):
          
          # within a safe x range (just pose estimation result, in case kalman filter not good)
          if (X[0,0] > target_x - 75  and X[0,0] < target_x + 45 and aland == 0):
@@ -432,12 +432,12 @@ def main():
                prepose_z = pos_z
 
                # set speed
-               if (current_y < target_y-8):
+               if (current_y < target_y-20):
                    speedy = -0.01                      #!!!Notice that the coordinate of world and drone are reversed
-                   distance = target_y-8-current_y
-               if (current_y > target_y+10):
+                   distance = target_y-20-current_y
+               if (current_y > target_y+20):
                    speedy = 0.02                       #!!!Notice that the coordinate of world and drone are reversed
-                   distance = current_y-target_y-10              
+                   distance = current_y-target_y-20             
  
                # Prediction in Kalman filter
                X = prediction2d(X[0][0], X[1][0])
